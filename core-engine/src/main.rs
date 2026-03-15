@@ -1,29 +1,31 @@
-use tonic::{transport::Server, Request, Response, Status};
+﻿use tonic::{transport::Server, Request, Response, Status};
 use inference::inference_provider_server::{InferenceProvider, InferenceProviderServer};
 use inference::{WeightPackage, TransferStatus};
 
-// Define the gRPC module from our proto
+// This tells Rust to include the code it auto-generated from your .proto file!
 pub mod inference {
-    tonic::include_proto!("inference");
+    tonic::include_proto!("inference"); 
 }
 
-#[derive(Default)]
-pub struct MyInferenceEngine {}
+// 1. Define our Master Node service
+#[derive(Debug, Default)]
+pub struct MyInferenceProvider {}
 
+// 2. Implement the gRPC logic defined in your proto file
 #[tonic::async_trait]
-impl InferenceProvider for MyInferenceEngine {
+impl InferenceProvider for MyInferenceProvider {
     async fn distribute_weights(
         &self,
         request: Request<WeightPackage>,
     ) -> Result<Response<TransferStatus>, Status> {
-        let pkt = request.into_inner();
+        println!("📥 Received weight package from a worker!");
         
-        println!("📡 Node Received: {} weights (Scale: {})", pkt.data.len(), pkt.scale);
-
+        // Send a success message back to the worker
         let reply = TransferStatus {
             received: true,
-            node_id: "Lumina-Node-01".into(),
+            node_id: "master-node-01".into(),
         };
+
         Ok(Response::new(reply))
     }
 }
@@ -31,13 +33,14 @@ impl InferenceProvider for MyInferenceEngine {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = "[::1]:50051".parse()?;
-    let engine = MyInferenceEngine::default();
+    let provider = MyInferenceProvider::default();
+    
+    println!("🚀 Master Node booting up...");
+    println!("📡 Listening for Worker connections on {}", addr);
 
-    println!("🚀 Lumina-Dist Master Node listening on {}", addr);
-    println!("💡 Status: Waiting for Distributed Workers...");
-
+    // 3. Start the server and ATTACH the service!
     Server::builder()
-        .add_service(InferenceProviderServer::new(engine))
+        .add_service(InferenceProviderServer::new(provider)) // <-- This is the magic line that fixes the error!
         .serve(addr)
         .await?;
 
