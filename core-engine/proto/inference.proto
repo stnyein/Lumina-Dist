@@ -1,0 +1,16 @@
+syntax = "proto3";
+package inference;
+
+service InferenceProvider {
+  rpc DistributeWeights (WeightPackage) returns (TransferStatus);
+}
+
+message WeightPackage {
+  bytes data = 1;
+  float scale = 2;
+}
+
+message TransferStatus {
+  bool received = 1;
+  string node_id = 2;
+}
