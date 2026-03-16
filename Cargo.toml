@@ -1,5 +1,5 @@
-﻿[workspace]
+[workspace]
 members = [
-    "core-engine",
+    "core-engine", "worker-node",
 ]
 resolver = "2"

@@ -1,29 +1,36 @@
 ﻿use tonic::{transport::Server, Request, Response, Status};
 use inference::inference_provider_server::{InferenceProvider, InferenceProviderServer};
 use inference::{WeightPackage, TransferStatus};
+use ndarray::Array2;
 
-// This tells Rust to include the code it auto-generated from your .proto file!
 pub mod inference {
     tonic::include_proto!("inference"); 
 }
 
-// 1. Define our Master Node service
 #[derive(Debug, Default)]
 pub struct MyInferenceProvider {}
 
-// 2. Implement the gRPC logic defined in your proto file
 #[tonic::async_trait]
 impl InferenceProvider for MyInferenceProvider {
     async fn distribute_weights(
         &self,
         request: Request<WeightPackage>,
     ) -> Result<Response<TransferStatus>, Status> {
-        println!("📥 Received weight package from a worker!");
+        let payload = request.into_inner();
         
-        // Send a success message back to the worker
+        println!("📥 Received network payload from worker!");
+        println!("📊 Declared Shape: {}x{}", payload.rows, payload.cols);
+
+        let matrix: Array2<f32> = bincode::deserialize(&payload.data)
+            .map_err(|e| Status::internal(format!("Failed to deserialize: {}", e)))?;
+
+        println!("✅ Successfully reconstructed the AI matrix!");
+        println!("🧮 First element in matrix is: {}", matrix[[0, 0]]);
+
         let reply = TransferStatus {
             received: true,
             node_id: "master-node-01".into(),
+            result_data: vec![],
         };
 
         Ok(Response::new(reply))
@@ -38,9 +45,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🚀 Master Node booting up...");
     println!("📡 Listening for Worker connections on {}", addr);
 
-    // 3. Start the server and ATTACH the service!
     Server::builder()
-        .add_service(InferenceProviderServer::new(provider)) // <-- This is the magic line that fixes the error!
+        .add_service(InferenceProviderServer::new(provider))
         .serve(addr)
         .await?;
 

@@ -1,4 +1,4 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 package inference;
 
 service InferenceProvider {
@@ -6,11 +6,13 @@ service InferenceProvider {
 }
 
 message WeightPackage {
-  bytes data = 1;
-  float scale = 2;
+  bytes data = 1;      // The serialized raw matrix bytes
+  uint32 rows = 2;     // Number of rows
+  uint32 cols = 3;     // Number of columns
 }
 
 message TransferStatus {
   bool received = 1;
   string node_id = 2;
+  bytes result_data = 3; // The computed matrix answer sent back to Master!
 }
