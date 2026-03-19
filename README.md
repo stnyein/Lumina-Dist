@@ -54,6 +54,23 @@ At the core of Lumina-Dist is an autonomous Rust-native Agent. It acts as an int
 
 ---
 
+# 🛡️ Safety & Guardrails
+
+Lumina-Dist implements strict on-chain and off-chain safeguards:
+* **Permissioned Execution:** The Master Node will not allocate compute or distribute shards without prior cryptographic verification of a `$LUMINA` transaction on Solana.
+* **Bare-Metal Isolation:** By utilizing Rust, worker nodes execute matrix math in memory-safe, isolated environments to prevent buffer overflows or malicious payload injections.
+* **Network Integrity:** gRPC transmissions are strictly typed and compressed, preventing malformed data from crashing the Reassembly Brain.
+
+---
+
+## 🚀 Launch Plan & Token Utility
+
+* **Phase 1 (Hackathon MVP):** Deploy the MVP inference engine and establish the `$LUMINA` liquidity pool via DeAura (pending sponsor platform stabilization).
+* **Phase 2 (Testnet Scaling):** Onboard independent GPU/CPU operators to run `worker-nodes`, using `$LUMINA` emissions to bootstrap the network's decentralized compute capacity.
+* **Phase 3 (Mainnet):** Open the Master Node API to consumer AI applications, requiring them to burn/spend `$LUMINA` to access the decentralized inference power.
+
+---
+
 ## ⚙️ Quick Start
 
 ### 1. Boot the Master Node (The Brain)
