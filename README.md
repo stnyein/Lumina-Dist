@@ -90,3 +90,8 @@ cargo run --bin worker-node -- --port 50051
 ```
 
 Connects to the Master, ingests the matrix shard, processes it using parallel CPU cores, and returns the compressed payload via gRPC.
+
+---
+
+> **⚖️ Disclosures (per hackathon rules):** 
+> The core infrastructure and agentic logic of Lumina-Dist are custom-written in bare-metal Rust. To achieve high-performance distributed computing, this project utilizes the open-source `Rayon` crate for parallelization and the open-source `gRPC` framework for node-to-node network transmission.
